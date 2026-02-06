@@ -1,0 +1,67 @@
+# Azure AI Search → Milvus 移行設定
+#
+# 環境変数による上書き:
+#   AZURE_SEARCH_ENDPOINT, AZURE_SEARCH_API_KEY, AZURE_SEARCH_INDEX_NAME
+#   MILVUS_URI, MILVUS_TOKEN
+#   ZILLIZ_ENDPOINT, ZILLIZ_API_KEY
+
+azure_search:
+  # Azure AI Search サービスのエンドポイント
+  endpoint: "https://your-search-service.search.windows.net"
+  # 移行対象のインデックス名
+  index_name: "your-index-name"
+  # API キー (環境変数 AZURE_SEARCH_API_KEY を推奨)
+  api_key: ""
+  # Entra ID (Azure AD) 認証を使用する場合は true
+  use_entra_id: false
+  # API バージョン
+  api_version: "2024-07-01"
+
+milvus:
+  # Milvus サーバーの URI (セルフホストの場合)
+  uri: "http://localhost:19530"
+  # 認証トークン
+  token: ""
+  # データベース名
+  db_name: "default"
+  # 移行先のコレクション名 (空の場合はインデックス名から自動生成)
+  collection_name: ""
+
+  # --- Zilliz Cloud を使用する場合 ---
+  # use_zilliz: true
+  # zilliz_endpoint: "https://in01-xxxxxxx.api.gcp-us-west1.zillizcloud.com"
+  # zilliz_api_key: ""  # 環境変数 ZILLIZ_API_KEY を推奨
+
+options:
+  # バッチサイズ (Azure API の上限は 1000)
+  batch_size: 500
+  # 並列ワーカー数
+  max_workers: 4
+  # チェックポイントの保存ディレクトリ
+  checkpoint_dir: ".checkpoints"
+  # 既存コレクションを削除して再作成
+  drop_existing_collection: false
+  # ドライラン (実際の書き込みなし)
+  dry_run: false
+
+  # Dynamic Field を有効にする (スキーマ外のフィールドも格納可能)
+  enable_dynamic_field: true
+  # パーティションキーフィールド (マルチテナンシー用)
+  # partition_key_field: "tenant_id"
+  # VARCHAR フィールドの最大長
+  varchar_max_length: 65535
+  # ARRAY フィールドの最大要素数
+  array_max_capacity: 4096
+
+  # フィールドごとの設定上書き
+  field_overrides: {}
+    # content:
+    #   milvus_name: "text_content"
+    #   max_length: 32768
+    # metadata:
+    #   milvus_name: "doc_metadata"
+
+  # 移行対象外のフィールド
+  exclude_fields: []
+    # - "internal_score"
+    # - "debug_info"
