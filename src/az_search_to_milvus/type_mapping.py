@@ -1,8 +1,8 @@
-"""Comprehensive type mapping from Azure AI Search Edm types to Milvus DataTypes.
+"""Azure AI Search の Edm 型から Milvus DataType への包括的な型マッピング。
 
-Azure AI Search field types are based on the OData Entity Data Model (Edm).
-This module provides a complete mapping to Milvus 2.6.x DataTypes, including
-scalar types, collection (array) types, and vector types.
+Azure AI Search のフィールド型は OData Entity Data Model (Edm) に基づいています。
+このモジュールは、スカラー型、コレクション (配列) 型、およびベクトル型を含む
+Milvus 2.6.x DataType への完全なマッピングを提供します。
 """
 
 from __future__ import annotations
@@ -15,32 +15,32 @@ from pymilvus import DataType
 
 
 class MappingConfidence(Enum):
-    """Confidence level for a type mapping."""
+    """型マッピングの信頼度レベル。"""
 
     EXACT = "exact"
-    LOSSLESS = "lossless"  # Safe upcast, no data loss
-    LOSSY = "lossy"  # Potential precision loss
-    SEMANTIC = "semantic"  # Structurally different but semantically equivalent
-    UNSUPPORTED = "unsupported"  # No Milvus equivalent
+    LOSSLESS = "lossless"  # 安全なアップキャスト、データ損失なし
+    LOSSY = "lossy"  # 精度損失の可能性あり
+    SEMANTIC = "semantic"  # 構造は異なるが意味的に等価
+    UNSUPPORTED = "unsupported"  # Milvus に対応する型なし
 
 
 @dataclass(frozen=True)
 class TypeMapping:
-    """Describes how an Azure AI Search type maps to a Milvus type."""
+    """Azure AI Search の型が Milvus の型にどのようにマッピングされるかを記述する。"""
 
     edm_type: str
     milvus_type: DataType
     confidence: MappingConfidence
     is_vector: bool = False
-    element_type: DataType | None = None  # For ARRAY fields
-    default_max_length: int | None = None  # For VARCHAR
+    element_type: DataType | None = None  # ARRAY フィールド用
+    default_max_length: int | None = None  # VARCHAR 用
     notes: str = ""
     warnings: list[str] = field(default_factory=list)
     milvus_extras: dict[str, Any] = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
-# Scalar type mappings
+# スカラー型マッピング
 # ---------------------------------------------------------------------------
 
 SCALAR_TYPE_MAP: dict[str, TypeMapping] = {
@@ -118,7 +118,7 @@ SCALAR_TYPE_MAP: dict[str, TypeMapping] = {
 }
 
 # ---------------------------------------------------------------------------
-# Collection (array) type mappings — non-vector
+# コレクション (配列) 型マッピング — 非ベクトル
 # ---------------------------------------------------------------------------
 
 COLLECTION_TYPE_MAP: dict[str, TypeMapping] = {
@@ -150,7 +150,7 @@ COLLECTION_TYPE_MAP: dict[str, TypeMapping] = {
 }
 
 # ---------------------------------------------------------------------------
-# Vector type mappings
+# ベクトル型マッピング
 # ---------------------------------------------------------------------------
 
 VECTOR_TYPE_MAP: dict[str, TypeMapping] = {
@@ -201,7 +201,7 @@ VECTOR_TYPE_MAP: dict[str, TypeMapping] = {
 
 
 # ---------------------------------------------------------------------------
-# Unsupported / AI Search-only features
+# 未サポート / AI Search 専用機能
 # ---------------------------------------------------------------------------
 
 UNSUPPORTED_FEATURES: dict[str, str] = {
@@ -241,39 +241,39 @@ UNSUPPORTED_FEATURES: dict[str, str] = {
 
 
 def resolve_type(edm_type: str, *, is_vector_field: bool = False) -> TypeMapping:
-    """Resolve an Azure AI Search Edm type string to a Milvus TypeMapping.
+    """Azure AI Search の Edm 型文字列を Milvus の TypeMapping に解決する。
 
-    Parameters
+    パラメータ
     ----------
     edm_type:
-        The Edm type string (e.g. ``"Edm.String"``, ``"Collection(Edm.Single)"``).
+        Edm 型文字列 (例: ``"Edm.String"``、``"Collection(Edm.Single)"``)。
     is_vector_field:
-        Whether this field has ``vectorSearchProfile`` set.  Used to
-        disambiguate ``Collection(Edm.Single)`` between a vector field and
-        a scalar float array (edge case).
+        このフィールドに ``vectorSearchProfile`` が設定されているかどうか。
+        ``Collection(Edm.Single)`` がベクトルフィールドかスカラー float 配列かを
+        判別するために使用される (エッジケース)。
 
-    Returns
+    戻り値
     -------
-    TypeMapping with the resolved Milvus type and metadata.
+    解決された Milvus 型とメタデータを含む TypeMapping。
     """
-    # Vector fields
+    # ベクトルフィールド
     if is_vector_field and edm_type in VECTOR_TYPE_MAP:
         return VECTOR_TYPE_MAP[edm_type]
 
-    # Collection(Edm.Single) without vectorSearchProfile → treat as vector
-    # since Azure AI Search nearly always uses it as a vector field
+    # vectorSearchProfile なしの Collection(Edm.Single) → ベクトルとして扱う
+    # Azure AI Search ではほぼ常にベクトルフィールドとして使用されるため
     if edm_type in VECTOR_TYPE_MAP:
         return VECTOR_TYPE_MAP[edm_type]
 
-    # Non-vector collections
+    # 非ベクトルコレクション
     if edm_type in COLLECTION_TYPE_MAP:
         return COLLECTION_TYPE_MAP[edm_type]
 
-    # Scalar types
+    # スカラー型
     if edm_type in SCALAR_TYPE_MAP:
         return SCALAR_TYPE_MAP[edm_type]
 
-    # Unknown type
+    # 未知の型
     return TypeMapping(
         edm_type=edm_type,
         milvus_type=DataType.JSON,
@@ -284,7 +284,7 @@ def resolve_type(edm_type: str, *, is_vector_field: bool = False) -> TypeMapping
 
 
 def get_all_mappings() -> list[TypeMapping]:
-    """Return every known type mapping for documentation / reporting."""
+    """ドキュメント作成 / レポート用にすべての既知の型マッピングを返す。"""
     mappings: list[TypeMapping] = []
     mappings.extend(SCALAR_TYPE_MAP.values())
     mappings.extend(COLLECTION_TYPE_MAP.values())

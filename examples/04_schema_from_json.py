@@ -1,14 +1,14 @@
-"""Example: Schema conversion from a JSON export.
+"""例: JSON エクスポートからのスキーマ変換。
 
-Convert an Azure AI Search index definition exported via REST API
-to a Milvus collection schema — without connecting to Azure.
+REST API 経由でエクスポートした Azure AI Search インデックス定義を
+Azure に接続せずに Milvus コレクションスキーマへ変換する。
 
-This is useful for:
-- Offline analysis of index schemas
-- CI/CD pipelines
-- Testing schema conversions before accessing the live service
+以下の用途に便利:
+- インデックススキーマのオフライン分析
+- CI/CD パイプライン
+- 本番サービスにアクセスする前のスキーマ変換テスト
 
-Usage:
+使い方:
     python examples/04_schema_from_json.py
 """
 
@@ -22,7 +22,7 @@ from az_search_to_milvus.schema_converter import SchemaConverter
 
 console = Console()
 
-# Example Azure AI Search index definition (JSON format)
+# Azure AI Search インデックス定義の例 (JSON 形式)
 SAMPLE_INDEX_JSON = {
     "name": "products-index",
     "fields": [

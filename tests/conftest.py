@@ -1,4 +1,4 @@
-"""Shared test fixtures for the migration tool test suite."""
+"""移行ツールテストスイート共有フィクスチャ。"""
 
 from __future__ import annotations
 
@@ -8,12 +8,12 @@ import pytest
 
 
 # ---------------------------------------------------------------------------
-# Mock Azure AI Search field/index objects
+# Azure AI Search フィールド/インデックスのモックオブジェクト
 # ---------------------------------------------------------------------------
 
 
 class MockSearchField:
-    """Mimics ``azure.search.documents.indexes.models.SearchField``."""
+    """``azure.search.documents.indexes.models.SearchField`` のモック。"""
 
     def __init__(self, **kwargs: Any) -> None:
         self.name: str = kwargs.get("name", "")
@@ -67,7 +67,7 @@ class MockVectorSearch:
 
 
 class MockSearchIndex:
-    """Mimics ``azure.search.documents.indexes.models.SearchIndex``."""
+    """``azure.search.documents.indexes.models.SearchIndex`` のモック。"""
 
     def __init__(
         self,
@@ -89,13 +89,13 @@ class MockSearchIndex:
 
 
 # ---------------------------------------------------------------------------
-# Fixtures
+# フィクスチャ
 # ---------------------------------------------------------------------------
 
 
 @pytest.fixture()
 def simple_index() -> MockSearchIndex:
-    """A simple index with scalar + vector fields."""
+    """スカラー + ベクトルフィールドを含むシンプルなインデックス。"""
     return MockSearchIndex(
         name="products",
         fields=[
@@ -133,7 +133,7 @@ def simple_index() -> MockSearchIndex:
 
 @pytest.fixture()
 def complex_index() -> MockSearchIndex:
-    """A more complex index with multiple vector fields and unsupported features."""
+    """複数ベクトルフィールドと非対応機能を含む複雑なインデックス。"""
     return MockSearchIndex(
         name="documents-v2",
         fields=[
@@ -182,7 +182,7 @@ def complex_index() -> MockSearchIndex:
 
 @pytest.fixture()
 def sample_documents() -> list[dict[str, Any]]:
-    """Sample Azure AI Search documents for data transformer tests."""
+    """データ変換テスト用のサンプル Azure AI Search ドキュメント。"""
     return [
         {
             "id": "doc-001",

@@ -1,4 +1,4 @@
-"""Azure AI Search client wrapper for schema extraction and data export."""
+"""Azure AI Search クライアントラッパー。スキーマ取得とデータエクスポート用。"""
 
 from __future__ import annotations
 
@@ -16,12 +16,12 @@ logger = logging.getLogger("az_search_to_milvus.clients.ai_search")
 
 
 class AzureSearchClientWrapper:
-    """High-level wrapper around the Azure AI Search SDK.
+    """Azure AI Search SDK の高レベルラッパー。
 
-    Provides methods for:
-    - Listing indexes
-    - Retrieving index schemas
-    - Extracting all documents in batches
+    提供するメソッド:
+    - インデックス一覧の取得
+    - インデックススキーマの取得
+    - 全ドキュメントのバッチ抽出
     """
 
     def __init__(self, config: AzureSearchConfig) -> None:
@@ -39,23 +39,23 @@ class AzureSearchClientWrapper:
         return AzureKeyCredential(self.config.api_key)
 
     def list_indexes(self) -> list[str]:
-        """Return a list of all index names in the search service."""
+        """検索サービス内の全インデックス名のリストを返す。"""
         return [idx.name for idx in self._index_client.list_indexes()]
 
     def get_index(self, index_name: str | None = None) -> SearchIndex:
-        """Retrieve the full index definition (schema).
+        """インデックス定義（スキーマ）の完全な情報を取得する。
 
-        Parameters
+        パラメータ
         ----------
         index_name:
-            Name of the index.  Defaults to ``config.index_name``.
+            インデックス名。デフォルトは ``config.index_name``。
         """
         name = index_name or self.config.index_name
         logger.info("インデックス '%s' のスキーマを取得中...", name)
         return self._index_client.get_index(name)
 
     def get_document_count(self, index_name: str | None = None) -> int:
-        """Return the approximate document count for the index."""
+        """インデックスの概算ドキュメント数を返す。"""
         name = index_name or self.config.index_name
         search_client = SearchClient(
             endpoint=self.config.endpoint,
@@ -73,21 +73,21 @@ class AzureSearchClientWrapper:
         select: list[str] | None = None,
         skip_count: int = 0,
     ) -> Generator[list[dict[str, Any]], None, None]:
-        """Yield batches of documents from the index.
+        """インデックスからドキュメントをバッチごとに yield する。
 
-        Uses ``search(*)`` with ordering by the key field and pagination.
-        The Azure SDK's paged iterator handles continuation tokens internally.
+        ``search(*)`` を使用し、キーフィールドでの並び替えとページネーションを行う。
+        Azure SDK のページイテレータが継続トークンを内部的に処理する。
 
-        Parameters
+        パラメータ
         ----------
         index_name:
-            Target index.
+            対象インデックス。
         batch_size:
-            Number of documents per batch (max 1000 per Azure API limits).
+            バッチあたりのドキュメント数（Azure API の上限により最大 1000）。
         select:
-            Fields to include.  ``None`` means all fields.
+            含めるフィールド。``None`` の場合は全フィールド。
         skip_count:
-            Number of documents to skip (for checkpoint resume).
+            スキップするドキュメント数（チェックポイント再開用）。
         """
         name = index_name or self.config.index_name
         search_client = SearchClient(
@@ -96,7 +96,7 @@ class AzureSearchClientWrapper:
             credential=self._credential,
         )
 
-        # Determine the key field for ordering
+        # 並び替え用のキーフィールドを特定する
         index_def = self.get_index(name)
         key_field = next(
             (f.name for f in index_def.fields if getattr(f, "key", False)),
@@ -123,7 +123,7 @@ class AzureSearchClientWrapper:
         doc_count = 0
 
         for doc in results:
-            # Convert to plain dict and remove Azure metadata
+            # プレーンな dict に変換し、Azure メタデータを除去する
             record = {k: v for k, v in doc.items() if not k.startswith("@")}
             batch.append(record)
             doc_count += 1
@@ -145,7 +145,7 @@ class AzureSearchClientWrapper:
         *,
         select: list[str] | None = None,
     ) -> list[dict[str, Any]]:
-        """Extract all documents as a flat list (convenience for small indexes)."""
+        """全ドキュメントをフラットなリストとして抽出する（小規模インデックス向けの簡易メソッド）。"""
         docs: list[dict[str, Any]] = []
         for batch in self.extract_documents(index_name, select=select):
             docs.extend(batch)

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "az-search-to-milvus"
 version = "0.1.0"
-description = "Migration tool from Azure AI Search to Milvus/Zilliz — schema conversion, data migration, and validation"
+description = "Azure AI Search から Milvus/Zilliz への移行ツール — スキーマ変換、データ移行、バリデーション"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"

@@ -1,4 +1,4 @@
-"""Tests for the data transformer (unit tests, no external services)."""
+"""データ変換のテスト (外部サービス不要のユニットテスト)。"""
 
 from __future__ import annotations
 

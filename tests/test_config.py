@@ -1,4 +1,4 @@
-"""Tests for configuration loading."""
+"""設定ファイル読み込みのテスト。"""
 
 from __future__ import annotations
 

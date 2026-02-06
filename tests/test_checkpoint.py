@@ -1,4 +1,4 @@
-"""Tests for checkpoint management."""
+"""チェックポイント管理のテスト。"""
 
 from __future__ import annotations
 

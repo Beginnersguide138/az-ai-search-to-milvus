@@ -1,10 +1,10 @@
-"""Pre-migration assessment report generator.
+"""移行前アセスメントレポート生成モジュール。
 
-Analyzes an Azure AI Search index and produces a detailed report showing:
-- Schema compatibility analysis
-- Estimated Milvus resource requirements
-- Feature gap analysis (unsupported features)
-- Milvus advantages applicable to this workload
+Azure AI Search インデックスを分析し、以下を含む詳細レポートを生成します:
+- スキーマ互換性分析
+- Milvus リソース要件の見積もり
+- 機能ギャップ分析（非対応機能）
+- このワークロードに適用可能な Milvus の利点
 """
 
 from __future__ import annotations
@@ -33,26 +33,26 @@ logger = logging.getLogger("az_search_to_milvus.assessment")
 
 @dataclass
 class AssessmentReport:
-    """Complete pre-migration assessment."""
+    """移行前アセスメントの完全なレポート。"""
 
     index_name: str
     generated_at: str = ""
     document_count: int = 0
-    # Schema analysis
+    # スキーマ分析
     total_fields: int = 0
     convertible_fields: int = 0
     lossy_fields: int = 0
     skipped_fields: int = 0
     vector_fields: int = 0
-    # Feature gaps
+    # 機能ギャップ
     unsupported_features: list[str] = field(default_factory=list)
     warnings: list[dict[str, str]] = field(default_factory=list)
-    # Schema detail
+    # スキーマ詳細
     field_details: list[dict[str, Any]] = field(default_factory=list)
     index_details: list[dict[str, Any]] = field(default_factory=list)
-    # Milvus advantages
+    # Milvus の利点
     applicable_advantages: list[dict[str, str]] = field(default_factory=list)
-    # Overall verdict
+    # 総合判定
     migration_feasibility: str = ""  # "full" | "partial" | "complex"
 
     def __post_init__(self) -> None:
@@ -69,13 +69,13 @@ def generate_assessment(
     conversion: SchemaConversionResult,
     document_count: int = 0,
 ) -> AssessmentReport:
-    """Generate an assessment report from a schema conversion result."""
+    """スキーマ変換結果からアセスメントレポートを生成する。"""
     report = AssessmentReport(
         index_name=conversion.azure_index_name,
         document_count=document_count,
     )
 
-    # Analyze fields
+    # フィールドを分析
     for fc in conversion.field_conversions:
         detail: dict[str, Any] = {
             "azure_name": fc.azure_name,
@@ -105,7 +105,7 @@ def generate_assessment(
         if fc.mapping.is_vector:
             report.vector_fields += 1
 
-    # Analyze indexes
+    # インデックスを分析
     for ic in conversion.index_conversions:
         report.index_details.append({
             "azure_profile": ic.azure_profile_name,
@@ -117,7 +117,7 @@ def generate_assessment(
             "target_field": ic.target_field,
         })
 
-    # Warnings
+    # 警告
     for w in conversion.warnings:
         report.warnings.append({
             "category": w.category,
@@ -125,13 +125,13 @@ def generate_assessment(
             "field": w.field_name,
         })
 
-    # Unsupported features
+    # 非対応機能
     report.unsupported_features = list(conversion.unsupported_features)
 
-    # Milvus advantages
+    # Milvus の利点
     report.applicable_advantages = _identify_advantages(conversion)
 
-    # Feasibility verdict
+    # 実現可能性の判定
     if report.skipped_fields == 0 and report.lossy_fields == 0:
         report.migration_feasibility = "full"
     elif report.convertible_fields > 0:
@@ -143,7 +143,7 @@ def generate_assessment(
 
 
 def _identify_advantages(conversion: SchemaConversionResult) -> list[dict[str, str]]:
-    """Identify Milvus advantages applicable to this migration."""
+    """この移行に適用可能な Milvus の利点を特定する。"""
     advantages: list[dict[str, str]] = []
 
     has_vectors = any(fc.mapping.is_vector for fc in conversion.field_conversions)
@@ -232,10 +232,10 @@ def _identify_advantages(conversion: SchemaConversionResult) -> list[dict[str, s
 
 
 def print_assessment(report: AssessmentReport, console: Console | None = None) -> None:
-    """Pretty-print an assessment report to the console."""
+    """アセスメントレポートをコンソールに整形表示する。"""
     c = console or Console()
 
-    # Header
+    # ヘッダー
     c.print(Panel(
         f"[bold]Azure AI Search → Milvus 移行アセスメント[/bold]\n"
         f"インデックス: [cyan]{report.index_name}[/cyan]  |  "
@@ -244,7 +244,7 @@ def print_assessment(report: AssessmentReport, console: Console | None = None) -
         title="Assessment Report",
     ))
 
-    # Feasibility
+    # 実現可能性
     feas_color = {"full": "green", "partial": "yellow", "complex": "red"}.get(
         report.migration_feasibility, "white"
     )
@@ -254,7 +254,7 @@ def print_assessment(report: AssessmentReport, console: Console | None = None) -
         f" ({report.lossy_fields} 損失あり, {report.skipped_fields} スキップ)"
     )
 
-    # Field mapping table
+    # フィールドマッピングテーブル
     c.print("\n")
     field_table = Table(title="フィールドマッピング")
     field_table.add_column("Azure フィールド", style="cyan")
@@ -291,7 +291,7 @@ def print_assessment(report: AssessmentReport, console: Console | None = None) -
 
     c.print(field_table)
 
-    # Index mapping table
+    # インデックスマッピングテーブル
     if report.index_details:
         c.print("\n")
         idx_table = Table(title="インデックスマッピング")
@@ -311,21 +311,21 @@ def print_assessment(report: AssessmentReport, console: Console | None = None) -
             )
         c.print(idx_table)
 
-    # Warnings
+    # 警告
     if report.warnings:
         c.print("\n[yellow bold]⚠ 警告[/yellow bold]")
         for w in report.warnings:
             field_info = f" [{w['field']}]" if w.get("field") else ""
             c.print(f"  • {w['category']}{field_info}: {w['message']}")
 
-    # Unsupported features
+    # 非対応機能
     if report.unsupported_features:
         c.print("\n[red bold]✗ 非対応機能 (Azure AI Search 固有)[/red bold]")
         for feat in report.unsupported_features:
             desc = UNSUPPORTED_FEATURES.get(feat, feat)
             c.print(f"  • [red]{feat}[/red]: {desc}")
 
-    # Milvus advantages
+    # Milvus の利点
     if report.applicable_advantages:
         c.print("\n[green bold]✓ Milvus への移行で得られるメリット[/green bold]")
         for adv in report.applicable_advantages:

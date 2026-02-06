@@ -1,7 +1,7 @@
-"""Checkpoint management for resumable data migration.
+"""再開可能なデータ移行のためのチェックポイント管理。
 
-Checkpoints are stored as JSON files so that a migration can be resumed
-after a failure without re-processing already-migrated documents.
+チェックポイントは JSON ファイルとして保存され、障害発生後に
+移行済みドキュメントを再処理することなく移行を再開できます。
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from pathlib import Path
 
 @dataclass
 class MigrationCheckpoint:
-    """State of an in-progress migration."""
+    """実行中の移行の状態。"""
 
     index_name: str
     collection_name: str
@@ -59,7 +59,7 @@ class MigrationCheckpoint:
 
 
 class CheckpointManager:
-    """Persists :class:`MigrationCheckpoint` to the filesystem."""
+    """:class:`MigrationCheckpoint` をファイルシステムに永続化する。"""
 
     def __init__(self, checkpoint_dir: str | Path = ".checkpoints") -> None:
         self.dir = Path(checkpoint_dir)

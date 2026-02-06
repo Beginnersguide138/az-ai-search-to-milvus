@@ -1,4 +1,4 @@
-"""Milvus / Zilliz client wrapper for collection management and data insertion."""
+"""Milvus / Zilliz クライアントラッパー。コレクション管理とデータ挿入用。"""
 
 from __future__ import annotations
 
@@ -20,9 +20,9 @@ logger = logging.getLogger("az_search_to_milvus.clients.milvus")
 
 
 class MilvusClientWrapper:
-    """High-level wrapper around the Milvus Python SDK.
+    """Milvus Python SDK の高レベルラッパー。
 
-    Supports both self-hosted Milvus and Zilliz Cloud.
+    セルフホスト Milvus と Zilliz Cloud の両方に対応。
     """
 
     def __init__(self, config: MilvusConfig) -> None:
@@ -31,7 +31,7 @@ class MilvusClientWrapper:
         self._connected = False
 
     def connect(self) -> None:
-        """Establish connection to Milvus / Zilliz."""
+        """Milvus / Zilliz への接続を確立する。"""
         uri = self.config.effective_uri
         token = self.config.effective_token
 
@@ -75,16 +75,16 @@ class MilvusClientWrapper:
         *,
         drop_existing: bool = False,
     ) -> None:
-        """Create a Milvus collection from a ``CollectionSchema``.
+        """``CollectionSchema`` から Milvus コレクションを作成する。
 
-        Parameters
+        パラメータ
         ----------
         name:
-            Collection name.
+            コレクション名。
         schema:
-            The ``pymilvus.CollectionSchema`` to use.
+            使用する ``pymilvus.CollectionSchema``。
         drop_existing:
-            If ``True``, drop the existing collection first.
+            ``True`` の場合、既存のコレクションを先に削除する。
         """
         if drop_existing:
             self.drop_collection(name)
@@ -106,7 +106,7 @@ class MilvusClientWrapper:
         field_name: str,
         index_config: MilvusIndexConfig,
     ) -> None:
-        """Create a vector index on a field."""
+        """フィールドにベクトルインデックスを作成する。"""
         logger.info(
             "インデックス作成: collection=%s, field=%s, type=%s, metric=%s",
             collection_name,
@@ -133,9 +133,9 @@ class MilvusClientWrapper:
         collection_name: str,
         data: list[dict[str, Any]],
     ) -> int:
-        """Insert a batch of documents.
+        """ドキュメントのバッチを挿入する。
 
-        Returns the number of successfully inserted documents.
+        正常に挿入されたドキュメント数を返す。
         """
         if not data:
             return 0
@@ -148,18 +148,18 @@ class MilvusClientWrapper:
         return count
 
     def load_collection(self, collection_name: str) -> None:
-        """Load collection into memory for searching."""
+        """検索用にコレクションをメモリにロードする。"""
         logger.info("コレクション '%s' をメモリにロード中...", collection_name)
         self.client.load_collection(collection_name)
         logger.info("コレクション '%s' ロード完了", collection_name)
 
     def get_collection_stats(self, collection_name: str) -> dict[str, Any]:
-        """Return basic statistics for a collection."""
+        """コレクションの基本統計情報を返す。"""
         stats = self.client.get_collection_stats(collection_name)
         return stats
 
     def query_count(self, collection_name: str) -> int:
-        """Return the number of entities in a collection."""
+        """コレクション内のエンティティ数を返す。"""
         self.client.load_collection(collection_name)
         results = self.client.query(
             collection_name=collection_name,
@@ -177,7 +177,7 @@ class MilvusClientWrapper:
         limit: int = 5,
         output_fields: list[str] | None = None,
     ) -> list[dict[str, Any]]:
-        """Retrieve a sample of documents for validation."""
+        """検証用にドキュメントのサンプルを取得する。"""
         self.client.load_collection(collection_name)
         results = self.client.query(
             collection_name=collection_name,

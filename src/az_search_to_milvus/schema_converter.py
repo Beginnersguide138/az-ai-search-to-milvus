@@ -1,7 +1,7 @@
-"""Schema conversion engine: Azure AI Search index → Milvus collection schema.
+"""スキーマ変換エンジン: Azure AI Search インデックス → Milvus コレクションスキーマ。
 
-Reads an Azure AI Search ``SearchIndex`` definition (via the Python SDK or
-a JSON export) and produces the equivalent ``pymilvus.CollectionSchema``.
+Azure AI Search の ``SearchIndex`` 定義（Python SDK または JSON エクスポート経由）を
+読み取り、等価な ``pymilvus.CollectionSchema`` を生成する。
 """
 
 from __future__ import annotations
@@ -26,13 +26,13 @@ logger = logging.getLogger("az_search_to_milvus.schema_converter")
 
 
 # ---------------------------------------------------------------------------
-# Conversion result models
+# 変換結果モデル
 # ---------------------------------------------------------------------------
 
 
 @dataclass
 class FieldConversion:
-    """Result of converting a single field."""
+    """単一フィールドの変換結果。"""
 
     azure_name: str
     azure_type: str
@@ -46,7 +46,7 @@ class FieldConversion:
 
 @dataclass
 class IndexConversion:
-    """Result of converting a vector search algorithm/profile."""
+    """ベクトル検索アルゴリズム/プロファイルの変換結果。"""
 
     azure_profile_name: str
     azure_algorithm_kind: str
@@ -57,7 +57,7 @@ class IndexConversion:
 
 @dataclass
 class ConversionWarning:
-    """A warning generated during schema conversion."""
+    """スキーマ変換中に生成された警告。"""
 
     category: str  # "unsupported_feature" | "type_lossy" | "field_skip" | ...
     message: str
@@ -66,7 +66,7 @@ class ConversionWarning:
 
 @dataclass
 class SchemaConversionResult:
-    """Complete result of converting an Azure AI Search index to Milvus."""
+    """Azure AI Search インデックスから Milvus への変換結果。"""
 
     azure_index_name: str
     milvus_collection_name: str
@@ -91,33 +91,33 @@ class SchemaConversionResult:
 
 
 # ---------------------------------------------------------------------------
-# Schema converter
+# スキーマコンバーター
 # ---------------------------------------------------------------------------
 
 
 class SchemaConverter:
-    """Converts an Azure AI Search index schema to a Milvus collection schema."""
+    """Azure AI Search インデックスのスキーマを Milvus コレクションスキーマに変換する。"""
 
     def __init__(self, options: MigrationOptions | None = None) -> None:
         self.options = options or MigrationOptions()
 
     def convert_from_index(self, index: Any) -> SchemaConversionResult:
-        """Convert a ``SearchIndex`` object from the Azure SDK.
+        """Azure SDK の ``SearchIndex`` オブジェクトから変換する。
 
-        Parameters
+        パラメータ
         ----------
         index:
-            An ``azure.search.documents.indexes.models.SearchIndex`` instance.
+            ``azure.search.documents.indexes.models.SearchIndex`` のインスタンス。
         """
         index_name = index.name
         collection_name = self.options.field_overrides.get(
             "__collection_name__", {}
         ).get("milvus_name", index_name.replace("-", "_"))
 
-        # Collect vector search profiles/algorithms for reference
+        # ベクトル検索プロファイル/アルゴリズムを参照用に収集
         profiles, algorithms = self._parse_vector_search_config(index)
 
-        # Convert fields
+        # フィールドを変換
         field_conversions: list[FieldConversion] = []
         milvus_fields: list[FieldSchema] = []
         primary_key_field: str | None = None
@@ -130,17 +130,17 @@ class SchemaConverter:
             if fc.is_primary_key:
                 primary_key_field = fc.milvus_field.name if fc.milvus_field else None
 
-        # Build index conversions
+        # インデックス変換を構築
         index_conversions = self._build_index_conversions(
             field_conversions, profiles, algorithms
         )
 
-        # Detect unsupported features
+        # 非対応機能を検出
         warnings: list[ConversionWarning] = []
         unsupported: list[str] = []
         self._check_unsupported_features(index, warnings, unsupported)
 
-        # Add type-level warnings
+        # 型レベルの警告を追加
         for fc in field_conversions:
             for w in fc.mapping.warnings:
                 warnings.append(
@@ -159,7 +159,7 @@ class SchemaConverter:
                     )
                 )
 
-        # Ensure we have a primary key
+        # 主キーがあることを確認
         if primary_key_field is None:
             warnings.append(
                 ConversionWarning(
@@ -185,15 +185,15 @@ class SchemaConverter:
         )
 
     def convert_from_json(self, index_json: dict[str, Any]) -> SchemaConversionResult:
-        """Convert from a JSON dict (e.g. exported via REST API).
+        """JSON 辞書（例: REST API 経由でエクスポートされたもの）から変換する。
 
-        This creates a lightweight adapter so the same conversion logic applies.
+        同じ変換ロジックを適用するために軽量アダプターを作成する。
         """
         adapter = _JsonIndexAdapter(index_json)
         return self.convert_from_index(adapter)
 
     # ------------------------------------------------------------------
-    # Internal helpers
+    # 内部ヘルパー
     # ------------------------------------------------------------------
 
     def _convert_field(
@@ -208,7 +208,7 @@ class SchemaConverter:
         vector_profile: str | None = getattr(azure_field, "vector_search_profile_name", None)
         dimensions: int | None = getattr(azure_field, "vector_search_dimensions", None)
 
-        # Check exclusion
+        # 除外チェック
         if name in self.options.exclude_fields:
             return FieldConversion(
                 azure_name=name,
@@ -219,7 +219,7 @@ class SchemaConverter:
                 skip_reason="exclude_fields で除外指定",
             )
 
-        # Handle sub-fields of ComplexType recursively → flatten to JSON
+        # ComplexType のサブフィールドを再帰的に処理 → JSON にフラット化
         sub_fields = getattr(azure_field, "fields", None)
         if sub_fields:
             edm_type = "Edm.ComplexType"
@@ -229,11 +229,11 @@ class SchemaConverter:
         )
         mapping = resolve_type(edm_type, is_vector_field=is_vector)
 
-        # Determine Milvus field name (allow overrides)
+        # Milvus フィールド名を決定（オーバーライド許可）
         override = self.options.field_overrides.get(name, {})
         milvus_name = override.get("milvus_name", name)
 
-        # Build FieldSchema
+        # FieldSchema を構築
         kwargs: dict[str, Any] = {
             "name": milvus_name,
             "dtype": mapping.milvus_type,
@@ -242,7 +242,7 @@ class SchemaConverter:
 
         if is_key:
             kwargs["is_primary"] = True
-            # Milvus primary keys must be INT64 or VARCHAR
+            # Milvus の主キーは INT64 または VARCHAR でなければならない
             if mapping.milvus_type not in (DataType.INT64, DataType.VARCHAR):
                 kwargs["dtype"] = DataType.VARCHAR
                 kwargs["max_length"] = self.options.varchar_max_length

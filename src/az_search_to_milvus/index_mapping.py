@@ -1,12 +1,12 @@
-"""Vector index algorithm mapping from Azure AI Search to Milvus.
+"""Azure AI Search から Milvus へのベクトルインデックスアルゴリズムマッピング。
 
-Azure AI Search supports two vector search algorithms:
+Azure AI Search は2つのベクトル検索アルゴリズムをサポートしています:
   - hnsw (Hierarchical Navigable Small World)
-  - exhaustiveKnn (brute-force)
+  - exhaustiveKnn (ブルートフォース)
 
-Milvus offers a much richer set of index types. This module maps the Azure
-algorithms to appropriate Milvus defaults and highlights the additional index
-types available in Milvus as migration advantages.
+Milvus はより豊富なインデックス型を提供しています。このモジュールは Azure の
+アルゴリズムを適切な Milvus のデフォルトにマッピングし、移行時の利点として
+Milvus で利用可能な追加のインデックス型を紹介します。
 """
 
 from __future__ import annotations
@@ -16,21 +16,21 @@ from typing import Any
 
 
 # ---------------------------------------------------------------------------
-# Distance metric mapping
+# 距離メトリクスマッピング
 # ---------------------------------------------------------------------------
 
 METRIC_MAP: dict[str, str] = {
     "cosine": "COSINE",
     "euclidean": "L2",
     "dotProduct": "IP",
-    # Azure AI Search also names these in camelCase in some API versions
+    # Azure AI Search は一部の API バージョンでキャメルケースの名前も使用する
     "hamming": "HAMMING",
 }
 
 
 @dataclass
 class MilvusIndexConfig:
-    """Resolved Milvus index configuration."""
+    """解決済みの Milvus インデックス設定。"""
 
     index_type: str
     metric_type: str
@@ -45,20 +45,20 @@ def map_vector_index(
     metric: str,
     hnsw_params: dict[str, Any] | None = None,
 ) -> MilvusIndexConfig:
-    """Map an Azure AI Search vector algorithm to a Milvus index config.
+    """Azure AI Search のベクトルアルゴリズムを Milvus インデックス設定にマッピングする。
 
-    Parameters
+    パラメータ
     ----------
     algorithm_kind:
-        ``"hnsw"`` or ``"exhaustiveKnn"`` (Azure AI Search algorithm kind).
+        ``"hnsw"`` または ``"exhaustiveKnn"`` (Azure AI Search のアルゴリズム種別)。
     metric:
-        Azure metric name: ``"cosine"``, ``"euclidean"``, or ``"dotProduct"``.
+        Azure のメトリクス名: ``"cosine"``、``"euclidean"``、または ``"dotProduct"``。
     hnsw_params:
-        HNSW parameters from Azure (``m``, ``efConstruction``, ``efSearch``).
+        Azure からの HNSW パラメータ (``m``、``efConstruction``、``efSearch``)。
 
-    Returns
+    戻り値
     -------
-    MilvusIndexConfig ready to use with ``pymilvus``.
+    ``pymilvus`` で使用可能な MilvusIndexConfig。
     """
     metric_type = METRIC_MAP.get(metric, "COSINE")
 
@@ -86,7 +86,7 @@ def map_vector_index(
             notes="Exhaustive KNN → Milvus FLAT (ブルートフォース)",
         )
 
-    # Fallback
+    # フォールバック
     return MilvusIndexConfig(
         index_type="HNSW",
         metric_type=metric_type,
@@ -97,12 +97,12 @@ def map_vector_index(
 
 
 # ---------------------------------------------------------------------------
-# Milvus-only index types (advantages over Azure AI Search)
+# Milvus 専用インデックス型 (Azure AI Search に対する優位性)
 # ---------------------------------------------------------------------------
 
 @dataclass(frozen=True)
 class MilvusOnlyIndex:
-    """An index type available in Milvus but not in Azure AI Search."""
+    """Milvus で利用可能だが Azure AI Search にはないインデックス型。"""
 
     name: str
     description: str

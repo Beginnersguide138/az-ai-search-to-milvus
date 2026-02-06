@@ -1,12 +1,12 @@
-"""Example: Full data migration with progress tracking.
+"""例: 進捗追跡付きの完全データ移行。
 
-Migrates all data from Azure AI Search to Milvus, including:
-- Schema conversion and collection creation
-- Vector index creation
-- Batch data transfer with checkpoint support
-- Progress reporting
+Azure AI Search から Milvus へ全データを移行する。以下を含む:
+- スキーマ変換とコレクション作成
+- ベクトルインデックス作成
+- チェックポイント対応のバッチデータ転送
+- 進捗レポート
 
-Usage:
+使い方:
     python examples/02_migrate.py
 """
 

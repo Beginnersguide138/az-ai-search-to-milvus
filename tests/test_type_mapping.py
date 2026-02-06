@@ -1,4 +1,4 @@
-"""Tests for the Edm → Milvus type mapping module."""
+"""Edm → Milvus 型マッピングモジュールのテスト。"""
 
 from pymilvus import DataType
 
@@ -129,8 +129,8 @@ class TestVectorTypeMappings:
         assert m.confidence == MappingConfidence.EXACT
 
     def test_float32_vector_without_flag(self) -> None:
-        """Collection(Edm.Single) should still map to FLOAT_VECTOR even
-        without the explicit is_vector_field flag."""
+        """Collection(Edm.Single) は明示的な is_vector_field フラグがなくても
+        FLOAT_VECTOR にマッピングされるべきである。"""
         m = resolve_type("Collection(Edm.Single)")
         assert m.milvus_type == DataType.FLOAT_VECTOR
         assert m.is_vector is True

@@ -1,4 +1,4 @@
-"""Tests for the schema conversion engine."""
+"""スキーマ変換エンジンのテスト。"""
 
 from __future__ import annotations
 
@@ -149,7 +149,7 @@ class TestFieldOverrides:
 
 class TestPartitionKey:
     def test_partition_key_set_on_varchar(self, simple_index) -> None:
-        """Partition key must be INT64 or VARCHAR in Milvus."""
+        """Milvus ではパーティションキーは INT64 または VARCHAR でなければならない。"""
         options = MigrationOptions(partition_key_field="title")
         converter = SchemaConverter(options)
         result = converter.convert_from_index(simple_index)
@@ -157,7 +157,7 @@ class TestPartitionKey:
         assert title_fc.milvus_field.is_partition_key is True
 
     def test_partition_key_invalid_type_generates_warning(self, simple_index) -> None:
-        """ARRAY fields cannot be partition keys — should warn and skip."""
+        """ARRAY フィールドはパーティションキーにできない — 警告してスキップすべき。"""
         options = MigrationOptions(partition_key_field="tags")
         converter = SchemaConverter(options)
         result = converter.convert_from_index(simple_index)

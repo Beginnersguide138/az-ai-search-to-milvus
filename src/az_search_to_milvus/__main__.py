@@ -1,4 +1,4 @@
-"""Entry point for ``python -m az_search_to_milvus``."""
+"""``python -m az_search_to_milvus`` のエントリーポイント。"""
 
 from az_search_to_milvus.cli import main
 

@@ -1,4 +1,4 @@
-"""Structured logging utilities using the ``rich`` library."""
+"""``rich`` ライブラリを使用した構造化ロギングユーティリティ。"""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ console = Console(stderr=True)
 
 
 def setup_logging(*, verbose: bool = False) -> logging.Logger:
-    """Configure and return the root logger for the migration tool."""
+    """移行ツールのルートロガーを設定して返す。"""
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(
         level=level,

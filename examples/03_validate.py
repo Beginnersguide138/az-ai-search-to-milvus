@@ -1,9 +1,9 @@
-"""Example: Post-migration validation.
+"""例: 移行後バリデーション。
 
-Verifies data integrity after migration by comparing document counts,
-schema structure, and sample data between Azure AI Search and Milvus.
+Azure AI Search と Milvus 間のドキュメント数、スキーマ構造、
+サンプルデータを比較して移行後のデータ整合性を検証する。
 
-Usage:
+使い方:
     python examples/03_validate.py
 """
 

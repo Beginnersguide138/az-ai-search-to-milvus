@@ -1,4 +1,4 @@
-"""Tests for vector index algorithm mapping."""
+"""ベクトルインデックスアルゴリズムマッピングのテスト。"""
 
 from az_search_to_milvus.index_mapping import (
     METRIC_MAP,

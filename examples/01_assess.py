@@ -1,9 +1,9 @@
-"""Example: Pre-migration assessment.
+"""例: 移行前アセスメント。
 
-Run schema analysis and generate a compatibility report without
-touching any data. This is the recommended first step.
+データに触れることなくスキーマ分析を実行し、互換性レポートを生成する。
+これが推奨される最初のステップである。
 
-Usage:
+使い方:
     python examples/01_assess.py
 """
 
