@@ -1,0 +1,51 @@
+# E2E テスト用設定ファイル
+#
+# 使い方:
+#   1. 環境変数を設定:
+#      export AZURE_SEARCH_ENDPOINT="https://your-service.search.windows.net"
+#      export AZURE_SEARCH_API_KEY="your-admin-key"
+#   2. 設定ファイルをコピー:
+#      cp examples/config.test.yaml config.yaml
+#   3. 移行テスト実行:
+#      python examples/e2e_migration_test.py
+
+azure_search:
+  # 環境変数から自動取得（空欄のまま可）
+  endpoint: ""
+  api_key: ""
+  # テストインデックス名（setup_test_index.py で作成）
+  index_name: "test-migration-products"
+  use_entra_id: false
+  api_version: "2024-07-01"
+
+milvus:
+  # ローカル Milvus（Docker / Milvus Standalone）
+  uri: "http://localhost:19530"
+  token: ""
+  db_name: "default"
+  collection_name: "test_migration_products"
+
+  # --- Zilliz Cloud を使用する場合 ---
+  # use_zilliz: true
+  # zilliz_endpoint: "https://in01-xxxxxxx.api.gcp-us-west1.zillizcloud.com"
+  # zilliz_api_key: ""
+
+options:
+  # テスト用設定
+  batch_size: 100
+  max_workers: 2
+  checkpoint_dir: ".checkpoints_test"
+
+  # テスト時は既存コレクションを毎回再作成
+  drop_existing_collection: true
+  dry_run: false
+
+  # Dynamic Field 有効（スキーマ外フィールドも格納可能）
+  enable_dynamic_field: true
+
+  # フィールド設定
+  varchar_max_length: 65535
+  array_max_capacity: 4096
+
+  field_overrides: {}
+  exclude_fields: []

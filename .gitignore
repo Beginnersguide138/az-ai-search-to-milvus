@@ -210,5 +210,9 @@ __marimo__/
 *.checkpoint.json
 migration_report_*.json
 assessment_report_*.json
+test_assessment_report.json
 config.yaml
 !config.example.yaml
+!config.test.yaml
+test_data.json
+.checkpoints_test/
