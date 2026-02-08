@@ -1,7 +1,7 @@
-"""Data migration engine: Azure AI Search → Milvus.
+"""データ移行エンジン: Azure AI Search → Milvus。
 
-Handles batch extraction from Azure AI Search, data transformation to match
-the Milvus schema, and insertion with checkpoint-based resumability.
+Azure AI Search からのバッチ抽出、Milvus スキーマに合わせたデータ変換、
+およびチェックポイントベースの再開機能付きデータ挿入を処理する。
 """
 
 from __future__ import annotations
@@ -24,10 +24,10 @@ logger = logging.getLogger("az_search_to_milvus.data_migrator")
 
 
 class DataTransformer:
-    """Transforms Azure AI Search documents to Milvus-compatible format.
+    """Azure AI Search ドキュメントを Milvus 互換フォーマットに変換する。
 
-    Uses the field conversion results from :class:`SchemaConverter` to know
-    how to map each field.
+    :class:`SchemaConverter` のフィールド変換結果を使用して、
+    各フィールドのマッピング方法を決定する。
     """
 
     def __init__(self, field_conversions: list[FieldConversion]) -> None:
@@ -45,10 +45,9 @@ class DataTransformer:
         return self._key_field
 
     def transform_document(self, doc: dict[str, Any]) -> dict[str, Any] | None:
-        """Transform a single Azure document to a Milvus-compatible dict.
+        """単一の Azure ドキュメントを Milvus 互換の dict に変換する。
 
-        Returns ``None`` if the document cannot be transformed (e.g. missing
-        primary key).
+        変換できない場合（例: 主キーの欠落）は ``None`` を返す。
         """
         result: dict[str, Any] = {}
 

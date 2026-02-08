@@ -267,10 +267,10 @@ class SchemaConverter:
                 )
 
         if mapping.milvus_type == DataType.JSON:
-            # JSON fields don't need extra params
+            # JSON フィールドは追加パラメータ不要
             pass
 
-        # Partition key support (Milvus requires INT64 or VARCHAR)
+        # パーティションキーサポート（Milvus は INT64 または VARCHAR が必要）
         if self.options.partition_key_field == name:
             if kwargs["dtype"] in (DataType.INT64, DataType.VARCHAR):
                 kwargs["is_partition_key"] = True
@@ -295,7 +295,7 @@ class SchemaConverter:
     def _parse_vector_search_config(
         self, index: Any
     ) -> tuple[dict[str, dict], dict[str, dict]]:
-        """Extract vector search profiles and algorithms from the index."""
+        """インデックスからベクトル検索プロファイルとアルゴリズムを抽出する。"""
         profiles: dict[str, dict] = {}
         algorithms: dict[str, dict] = {}
 
@@ -338,19 +338,19 @@ class SchemaConverter:
         profiles: dict[str, dict],
         algorithms: dict[str, dict],
     ) -> list[IndexConversion]:
-        """Build Milvus index configs for each vector field."""
+        """各ベクトルフィールドの Milvus インデックス設定を構築する。"""
         results: list[IndexConversion] = []
 
         for fc in field_conversions:
             if not fc.mapping.is_vector or fc.skipped:
                 continue
 
-            # Find the profile for this vector field
-            azure_field_obj = fc  # We need the original; extract profile name
+            # このベクトルフィールドのプロファイルを検索
+            azure_field_obj = fc  # 元のオブジェクトが必要；プロファイル名を抽出
             profile_name = ""
-            # The profile name was on the original field - we don't store it directly
-            # but we can look up by field name in the caller context.
-            # For now, we'll try to match the first profile.
+            # プロファイル名は元のフィールドにあった - 直接保存していないが、
+            # 呼び出し元のコンテキストでフィールド名から検索可能。
+            # 現時点では最初のプロファイルにマッチを試みる。
             algo_kind = "hnsw"
             metric = "cosine"
             hnsw_params: dict[str, Any] = {}

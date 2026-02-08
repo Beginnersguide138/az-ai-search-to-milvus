@@ -1,10 +1,10 @@
-"""Post-migration validation: verify data integrity after migration.
+"""移行後バリデーション: 移行後のデータ整合性を検証する。
 
-Performs:
-- Document count comparison
-- Sample-based field value comparison
-- Vector similarity spot-check
-- Schema consistency check
+実行内容:
+- ドキュメント数の比較
+- サンプルベースのフィールド値比較
+- ベクトル類似度のスポットチェック
+- スキーマ整合性チェック
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ logger = logging.getLogger("az_search_to_milvus.validation")
 
 @dataclass
 class ValidationCheck:
-    """Result of a single validation check."""
+    """単一バリデーションチェックの結果。"""
 
     name: str
     passed: bool
@@ -34,7 +34,7 @@ class ValidationCheck:
 
 @dataclass
 class ValidationReport:
-    """Aggregated validation results."""
+    """集約されたバリデーション結果。"""
 
     checks: list[ValidationCheck] = field(default_factory=list)
 
@@ -58,7 +58,7 @@ class ValidationReport:
 
 
 class MigrationValidator:
-    """Validates data integrity after migration."""
+    """移行後のデータ整合性を検証する。"""
 
     def __init__(
         self,
@@ -76,14 +76,14 @@ class MigrationValidator:
         sample_size: int = 100,
         count_tolerance_pct: float = 1.0,
     ) -> ValidationReport:
-        """Run all validation checks.
+        """全バリデーションチェックを実行する。
 
-        Parameters
+        パラメータ
         ----------
         sample_size:
-            Number of documents to spot-check for field value comparison.
+            フィールド値比較のためにスポットチェックするドキュメント数。
         count_tolerance_pct:
-            Acceptable percentage difference in document counts (default 1%).
+            ドキュメント数の許容誤差パーセンテージ（デフォルト 1%）。
         """
         report = ValidationReport()
         collection_name = self.conversion.milvus_collection_name
