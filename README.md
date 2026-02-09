@@ -1,3 +1,5 @@
+🌐 [日本語](README.md) | [English](README.en.md) | [中文](README.zh.md)
+
 # az-ai-search-to-milvus
 
 **Azure AI Search → Milvus/Zilliz 移行ツール**
