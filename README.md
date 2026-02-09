@@ -236,6 +236,7 @@ ruff check src/ tests/
 - [スキーマ対応表 (網羅版)](docs/schema_mapping.md)
 - [移行ガイド (ステップバイステップ)](docs/migration_guide.md)
 - [Milvus メリット解説](docs/milvus_advantages.md)
+- [E2E テストガイド](docs/testing_guide.md)
 
 ## ライセンス
 
